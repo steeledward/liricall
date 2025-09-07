@@ -1,6 +1,7 @@
 <template>
   <v-container>
     <v-btn
+      v-if="false"
       prepend-icon="mdi-credit-card"
       color="yellow"
       class="text-black"
