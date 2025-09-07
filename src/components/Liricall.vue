@@ -1,10 +1,29 @@
 <template>
+  <v-container>
+    <v-btn
+      prepend-icon="mdi-credit-card"
+      color="yellow"
+      class="text-black"
+      @click="goToOpenPay"
+    >
+      Pagar con tarjeta
+    </v-btn>
+  </v-container>
   <v-container class="fill-height" fluid>
-      <iframe
-        src="https://www.appsheet.com/start/b704b4e4-6206-4e16-8389-aafa864cff2a"
-        frameborder="0"
-        style="width:100%; height:100%;"
-        allowfullscreen
-      ></iframe>
+    <iframe
+      src="https://www.appsheet.com/start/b704b4e4-6206-4e16-8389-aafa864cff2a"
+      frameborder="0"
+      style="width: 100%; height: 100%"
+      allowfullscreen
+    ></iframe>
   </v-container>
 </template>
+<script setup>
+import { useRouter } from "vue-router";
+
+const router = useRouter();
+
+const goToOpenPay = () => {
+  router.push({ path: "/openpay" }); // Make sure your route is named 'OpenPay'
+};
+</script>
