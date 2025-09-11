@@ -1,9 +1,9 @@
 <template>
-  <Liricall />
+  <Index />
 </template>
 
 <script lang="ts" setup>
-  import Liricall from '@/components/Liricall.vue'
+  import Index from '@/components/Index.vue'
 
   //
 </script>

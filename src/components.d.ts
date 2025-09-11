@@ -9,7 +9,7 @@ export {}
 declare module 'vue' {
   export interface GlobalComponents {
     AppFooter: typeof import('./components/AppFooter.vue')['default']
-    Liricall: typeof import('./components/Liricall.vue')['default']
+    Index: typeof import('./components/Index.vue')['default']
     LiricallAdmin: typeof import('./components/LiricallAdmin.vue')['default']
     LiricallIFrameAppSheet: typeof import('./components/LiricallIFrameAppSheet.vue')['default']
     OpenPay: typeof import('./components/OpenPay.vue')['default']
