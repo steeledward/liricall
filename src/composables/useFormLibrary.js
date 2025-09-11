@@ -12,35 +12,36 @@ export function useFormLibrary () {
   const errorMessage = ref('')
 
   const formData = reactive({
-    title: 'Título de la canción',
-    story: 'Relato de la canción',
-    description: 'Norteño Banda con toques de Trap',
-    contact: '1111111111',
+    title: '',
+    story: '',
+    description: '',
+    contact: '',
   })
 
   // Validation rules
   const titleRules = [
-    value => !!value || 'Title is required',
-    value => (value && value.length >= 3) || 'Title must be at least 3 characters',
-    value => (value && value.length <= 100) || 'Title must be less than 100 characters',
+    value => !!value || 'Título es requerido',
+    value => (value && value.length >= 3) || 'Título debe ser al menos 3 caracteres',
+    value => (value && value.length <= 50) || 'Título debe ser máximo 50 caracteres',
   ]
 
   const storyRules = [
-    value => !!value || 'Story is required',
-    value => (value && value.length >= 10) || 'Story must be at least 10 characters',
-    value => (value && value.length <= 1000) || 'Story must be less than 1000 characters',
+    value => !!value || 'Relato es requerido',
+    value => (value && value.length >= 50) || 'Relato debe ser al menos 50 caracteres',
+    value => (value && value.length <= 1000) || 'Relato de ser máximo 1000 caracteres',
   ]
 
   const descriptionRules = [
-    value => !value || value.length <= 500 || 'Description must be less than 500 characters',
+    value => !!value || 'Descripción musical es requerida',
+    value => !value || value.length <= 500 || 'Descripción musical debe ser máximo 500 caracteres',
   ]
 
   const contactRules = [
-    value => !!value || 'Contact information is required',
+    value => !!value || 'Información de contacto es requerida, inventa un email o teléfono, tus datos están protegidos',
     value => {
       const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
       const phoneRegex = /^[\+]?[1-9][\d]{0,15}$/
-      return emailRegex.test(value) || phoneRegex.test(value) || 'Please enter a valid email or phone number'
+      return emailRegex.test(value) || phoneRegex.test(value) || 'Escribe un email o teléfono valido'
     },
   ]
 
