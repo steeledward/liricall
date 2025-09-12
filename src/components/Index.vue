@@ -2,14 +2,28 @@
   <v-container max-width="600">
     <v-card class="mx-auto" elevation="4">
       <v-card-text class="text-center">
-        <v-btn
-          class="text-black"
-          color="#ffc000"
-          prepend-icon="mdi-credit-card"
-          @click="goToOpenPay"
-        >
-          Pagar con tarjeta
-        </v-btn>
+        <v-row>
+          <v-col>
+            <v-btn
+              class="text-black"
+              color="#ffc000"
+              prepend-icon="mdi-library"
+              @click="goTolibrary"
+            >
+              Biblioteca
+            </v-btn>
+          </v-col>
+          <v-col>
+            <v-btn
+              class="text-black"
+              color="#ffc000"
+              prepend-icon="mdi-credit-card"
+              @click="goToOpenPay"
+            >
+              Pagar con tarjeta
+            </v-btn>
+          </v-col>
+        </v-row>
       </v-card-text>
     </v-card>
 
@@ -171,7 +185,11 @@
   const router = useRouter()
 
   function goToOpenPay () {
-    router.push({ path: '/openpay' }) // Make sure your route is named 'OpenPay'
+    router.push({ path: '/openpay' })
+  }
+
+  function goTolibrary () {
+    router.push({ path: '/appsheet' })
   }
 
   // Use the composable

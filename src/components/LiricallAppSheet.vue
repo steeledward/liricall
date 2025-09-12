@@ -1,13 +1,31 @@
 <template>
   <v-container>
-    <v-btn
-      class="text-black"
-      color="yellow"
-      prepend-icon="mdi-credit-card"
-      @click="goToOpenPay"
-    >
-      Pagar con tarjeta
-    </v-btn>
+    <v-card class="mx-auto" elevation="4">
+      <v-card-text class="text-center">
+        <v-row>
+          <v-col>
+            <v-btn
+              class="text-black"
+              color="#ffc000"
+              prepend-icon="mdi-music"
+              @click="goToCreateSong"
+            >
+              Crear Canción
+            </v-btn>
+          </v-col>
+          <v-col>
+            <v-btn
+              class="text-black"
+              color="#ffc000"
+              prepend-icon="mdi-credit-card"
+              @click="goToOpenPay"
+            >
+              Pagar con tarjeta
+            </v-btn>
+          </v-col>
+        </v-row>
+      </v-card-text>
+    </v-card>
   </v-container>
   <v-container class="fill-height" fluid>
     <iframe
@@ -22,6 +40,10 @@
   import { useRouter } from 'vue-router'
 
   const router = useRouter()
+
+  function goToCreateSong () {
+    router.push({ path: '/' })
+  }
 
   function goToOpenPay () {
     router.push({ path: '/openpay' }) // Make sure your route is named 'OpenPay'

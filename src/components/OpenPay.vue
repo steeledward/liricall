@@ -2,14 +2,28 @@
   <v-container>
     <v-card class="mx-auto" elevation="4">
       <v-card-text class="text-center">
-        <v-btn
-          class="text-black"
-          color="#ffc000"
-          prepend-icon="mdi-music"
-          @click="goToCreateSong"
-        >
-          Crear canción
-        </v-btn>
+        <v-row>
+          <v-col>
+            <v-btn
+              class="text-black"
+              color="#ffc000"
+              prepend-icon="mdi-library"
+              @click="goTolibrary"
+            >
+              Biblioteca
+            </v-btn>
+          </v-col>
+          <v-col>
+            <v-btn
+              class="text-black"
+              color="#ffc000"
+              prepend-icon="mdi-credit-card"
+              @click="goToCreateSong"
+            >
+              Crear Canción
+            </v-btn>
+          </v-col>
+        </v-row>
       </v-card-text>
     </v-card>
 
@@ -397,6 +411,10 @@
 
   function goToCreateSong () {
     router.push({ path: '/' })
+  }
+
+  function goTolibrary () {
+    router.push({ path: '/appsheet' })
   }
 
   async function fetchPackages () {
