@@ -11,6 +11,7 @@ declare module 'vue' {
     AppFooter: typeof import('./components/AppFooter.vue')['default']
     Index: typeof import('./components/Index.vue')['default']
     LiricallAdmin: typeof import('./components/LiricallAdmin.vue')['default']
+    LiricallAppSheet: typeof import('./components/LiricallAppSheet.vue')['default']
     LiricallIFrameAppSheet: typeof import('./components/LiricallIFrameAppSheet.vue')['default']
     OpenPay: typeof import('./components/OpenPay.vue')['default']
     RouterLink: typeof import('vue-router')['RouterLink']

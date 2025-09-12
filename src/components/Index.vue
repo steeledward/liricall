@@ -3,7 +3,20 @@
     <v-app>
       <v-main>
         <v-container class="pa-6">
-          <v-card class="mx-auto" elevation="4" max-width="800">
+          <v-card class="mx-auto" elevation="4">
+            <v-card-text class="text-center">
+              <v-btn
+                class="text-black"
+                color="#ffc000"
+                prepend-icon="mdi-credit-card"
+                @click="goToOpenPay"
+              >
+                Pagar con tarjeta
+              </v-btn>
+            </v-card-text>
+          </v-card>
+
+          <v-card class="mx-auto" elevation="4">
             <v-card-title class="text-h5 v-card-title-color text-black">
               <v-icon class="mr-2" icon="mdi-music" />
               Liricall - Tu Historia en una Canción
@@ -90,7 +103,11 @@
                       size="large"
                     >
                       <template #loader>
-                        <v-progress-circular color="white" indeterminate size="24" />
+                        <v-progress-circular
+                          color="white"
+                          indeterminate
+                          size="24"
+                        />
                       </template>
                       <v-icon class="mr-2" icon="mdi-send" />
                       Enviar
@@ -102,7 +119,11 @@
           </v-card>
 
           <!-- Success Dialog -->
-          <v-dialog v-model="successDialog" max-width="500" @after-leave="resetForm">
+          <v-dialog
+            v-model="successDialog"
+            max-width="500"
+            @after-leave="resetForm"
+          >
             <v-card>
               <v-card-title class="text-h6 v-card-title-color text-black">
                 ¡Información enviada correctamente!
@@ -115,7 +136,10 @@
               </v-card-text>
               <v-card-actions>
                 <v-spacer />
-                <v-btn class="primary-color" @click="closeSuccessDialog">Enterado</v-btn>
+                <v-btn
+                  class="primary-color"
+                  @click="closeSuccessDialog"
+                >Enterado</v-btn>
               </v-card-actions>
             </v-card>
           </v-dialog>
@@ -131,7 +155,10 @@
               </v-card-text>
               <v-card-actions>
                 <v-spacer />
-                <v-btn class="primary-color" @click="closeErrorDialog">Close</v-btn>
+                <v-btn
+                  class="primary-color"
+                  @click="closeErrorDialog"
+                >Close</v-btn>
               </v-card-actions>
             </v-card>
           </v-dialog>
@@ -142,9 +169,16 @@
 </template>
 <script setup lang="js">
   import { ref } from 'vue'
+  import { useRouter } from 'vue-router'
   import { useFormLibrary } from '@/composables/useFormLibrary'
 
   const form = ref(null)
+
+  const router = useRouter()
+
+  function goToOpenPay () {
+    router.push({ path: '/openpay' }) // Make sure your route is named 'OpenPay'
+  }
 
   // Use the composable
   const {
