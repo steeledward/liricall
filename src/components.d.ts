@@ -8,13 +8,20 @@ export {}
 /* prettier-ignore */
 declare module 'vue' {
   export interface GlobalComponents {
-    AppFooter: typeof import('./components/AppFooter.vue')['default']
+    AdminAppSheet: typeof import('./components/AdminAppSheet.vue')['default']
+    AppFooter: typeof import('./components/Footer.vue')['default']
+    Footer: typeof import('./components/Footer.vue')['default']
+    GlobalSnackbar: typeof import('./components/GlobalSnackbar.vue')['default']
+    Header: typeof import('./components/Header.vue')['default']
     Index: typeof import('./components/Index.vue')['default']
     LiricallAdmin: typeof import('./components/LiricallAdmin.vue')['default']
     LiricallAppSheet: typeof import('./components/LiricallAppSheet.vue')['default']
     LiricallIFrameAppSheet: typeof import('./components/LiricallIFrameAppSheet.vue')['default']
-    OpenPay: typeof import('./components/OpenPay.vue')['default']
+    OpenPay: typeof import('./components/Payment.vue')['default']
+    Payment: typeof import('./components/Payment.vue')['default']
+    PublicAppSheet: typeof import('./components/PublicAppSheet.vue')['default']
     RouterLink: typeof import('vue-router')['RouterLink']
     RouterView: typeof import('vue-router')['RouterView']
+    SocialLogin: typeof import('./components/Auth/SocialLogin.vue')['default']
   }
 }

@@ -1,39 +1,16 @@
 <template>
   <v-container>
-    <v-card class="mx-auto" elevation="4">
-      <v-card-text class="text-center">
-        <v-row>
-          <v-col>
-            <v-btn
-              class="text-black"
-              color="#ffc000"
-              prepend-icon="mdi-library"
-              @click="goTolibrary"
-            >
-              Biblioteca
-            </v-btn>
-          </v-col>
-          <v-col>
-            <v-btn
-              class="text-black"
-              color="#ffc000"
-              prepend-icon="mdi-credit-card"
-              @click="goToCreateSong"
-            >
-              Crear Canción
-            </v-btn>
-          </v-col>
-        </v-row>
-      </v-card-text>
-    </v-card>
-
-    <v-form
-      ref="form"
-      v-model="valid"
-      class="pt-4"
-      lazy-validation
-      @submit.prevent="pay"
-    >
+    <v-form ref="form" v-model="valid" lazy-validation @submit.prevent="pay">
+      <v-card>
+        <v-card-text>
+          <v-alert color="primary" variant="outlined">
+            <span class="small" variant="outlined">
+              Realiza tu compra ficticia. Guarda el <strong>ID</strong> y
+              aplícalo para crear tú canción gratis.
+            </span>
+          </v-alert>
+        </v-card-text>
+      </v-card>
       <v-card>
         <v-card-title>Paquetes LIRICALL</v-card-title>
         <v-divider thickness="1" />
@@ -238,15 +215,17 @@
               <span class="small" type="info" variant="outlined">
                 Transacciones realizadas vía:
               </span>
-              <v-img
-                alt="Opepay image"
-                height="40px"
-                src="/src/assets/openpay/openpay.png"
-              />
+              <a href="https://www.openpay.mx/" target="_blank">
+                <v-img
+                  alt="Opepay image"
+                  height="40px"
+                  src="/src/assets/openpay/openpay.png"
+                />
+              </a>
             </v-col>
             <v-col cols="12" md="8">
-              <v-alert type="info" variant="outlined">
-                <span class="small" type="info" variant="outlined">
+              <v-alert variant="outlined">
+                <span class="small" variant="outlined">
                   Tus pagos se realizan de forma segura con encriptación de 256
                   bits
                 </span>
@@ -259,7 +238,7 @@
           <v-btn
             class="black-text"
             :color="colorButton"
-            :disabled="!valid||processing"
+            :disabled="!valid || processing"
             prepend-icon="mdi-credit-card"
             type="submit"
             variant="tonal"
@@ -271,17 +250,17 @@
       </v-card>
     </v-form>
     <!-- Success Dialog -->
-    <v-dialog
-      v-model="successDialog"
-      max-width="500"
-    >
+    <v-dialog v-model="successDialog" max-width="500">
       <v-card>
         <v-card-title>¡Venta registrada exitósamente!</v-card-title>
         <v-card-text>
           <p><strong>Descripción:</strong> {{ description }}</p>
           <p><strong>Precio:</strong> {{ amount }}</p>
+          <p><strong>Canciones:</strong> {{ quantiy }}</p>
           <p><strong>Autorización:</strong> {{ charge.authorization }}</p>
-          <p><strong>ID:</strong> {{ charge.id }}</p>
+          <p>
+            <strong>ID:</strong><em style="color: #ffc000"> {{ charge.id }} </em>
+          </p>
           <p><strong>Cliente:</strong> {{ sale.customer }}</p>
         </v-card-text>
         <v-card-actions>
@@ -317,14 +296,12 @@
 
 <script setup>
   import { onMounted, ref, watch } from 'vue'
-  import { useRouter } from 'vue-router'
   import { useApi } from '@/composables/useApi'
-
-  const router = useRouter()
 
   const openpay_id = import.meta.env.VITE_OPENPAY_ID
   const openpay_key = import.meta.env.VITE_OPENPAY_PUBLIC_KEY
-  const openpay_sandbox_mode = import.meta.env.VITE_OPENPAY_SANDBOX_MODE === 'true'
+  const openpay_sandbox_mode
+    = import.meta.env.VITE_OPENPAY_SANDBOX_MODE === 'true'
   const apiHost = import.meta.env.VITE_API_BASE_URL
 
   const { api } = useApi()
@@ -334,20 +311,21 @@
 
   const packageSelected = ref('')
   const description = ref('')
-  const amount = ref(null)
+  const amount = ref('')
+  const quantiy = ref(0)
 
   // Response from Openpay charge
   const charge = ref({})
   const sale = ref({})
 
-  const name = ref('Steel Ed')
-  const last_name = ref('Vazquez George')
-  const email = ref('george.vazquez@example.com')
+  const name = ref('Santiago')
+  const last_name = ref('Hérnandez García')
+  const email = ref('santiago.hernandez@email.com')
   const phone_number = ref('5555555555')
 
   const number_card = ref('4111111111111111')
   const mask_credit_card = ref('credit-card')
-  const name_titular = ref('STEEL ED VAZQUEZ GEORGE')
+  const name_titular = ref('SANTIAGO HERNANDEZ GARCIA')
   const month_expiration = ref('12')
   const year_expiration = ref('32')
   const cvv2 = ref('123')
@@ -401,21 +379,15 @@
     if (!newVal) {
       description.value = ''
       amount.value = 0
+      quantiy.value = 0
       return
     }
     const selected = packages.value.find(pkg => pkg._id === newVal)
 
     description.value = selected ? selected.package : ''
     amount.value = selected ? selected.price : 0
+    quantiy.value = selected ? selected.quantity : 0
   })
-
-  function goToCreateSong () {
-    router.push({ path: '/' })
-  }
-
-  function goTolibrary () {
-    router.push({ path: '/appsheet' })
-  }
 
   async function fetchPackages () {
     try {
@@ -486,6 +458,7 @@
           amount: Number.parseFloat(amount.value),
           description: description.value,
           device_session_id: deviceSessionId.value,
+          quantity: quantiy.value,
         }
 
         const payload = {
@@ -497,6 +470,7 @@
         try {
           // POST sale to /api/sales
           const response = await api.post(`${apiHost}/api/sales`, payload)
+
           charge.value = response.data.charge
           sale.value = response.data.sale
 

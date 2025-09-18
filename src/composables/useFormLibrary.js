@@ -12,10 +12,12 @@ export function useFormLibrary () {
   const errorMessage = ref('')
 
   const formData = reactive({
-    title: '',
-    story: '',
-    description: '',
-    contact: '',
+    title: 'El Ingeniero de ACERO',
+    story: 'Era el Chaparrito De allá de la tierra que dicen que sí existe Decían que muy inteligente',
+    description: 'Norteño Banda reional Mexicano',
+    contact: 'steel.edward@gmail.com',
+    sale_id: '',
+    credits: 0,
   })
 
   // Validation rules
@@ -45,6 +47,46 @@ export function useFormLibrary () {
     },
   ]
 
+  const idRules = [
+    value => !!value || 'ID de AUTORIZACIÓN es requerido. Realiza una compra ficticia',
+    value => !value || value.length >= 20 || 'ID de AUTORIZACIÓN debe ser al menos de 20 caracteres',
+    value => !value || value.length <= 30 || 'ID de AUTORIZACIÓN debe ser máximo 30 caracteres',
+  ]
+
+  const validateSaleId = async () => {
+    loading.value = true
+
+    try {
+      // Use the api instance instead of axios directly
+      const response = await api.get('/api/credits/available/' + formData.sale_id, {
+        sale_id: formData.sale_id,
+      })
+
+      if (response.status === 200 || response.status === 201) {
+        formData.credits = response.data.available
+
+        return { success: true, data: response.data }
+      } else {
+        throw new Error(`Unexpected response status: ${response.status}`)
+      }
+    } catch (error) {
+      console.error('Error submitting form:', error)
+
+      if (error.response) {
+        errorMessage.value = `Server error: ${error.response.status} - ${error.response.data?.message || 'Unknown error'}`
+      } else if (error.request) {
+        errorMessage.value = 'Network error: Please check your connection and try again.'
+      } else {
+        errorMessage.value = `Error: ${error.message}`
+      }
+
+      errorDialog.value = true
+      return { success: false, error: errorMessage.value }
+    } finally {
+      loading.value = false
+    }
+  }
+
   // Submit form to API
   const submitForm = async () => {
     loading.value = true
@@ -56,7 +98,9 @@ export function useFormLibrary () {
         story: formData.story,
         description: formData.description,
         contact: formData.contact,
+        quantiy: formData.quantity,
         createdAt: new Date().toISOString(),
+        sale_id: formData.sale_id,
       }, {
         headers: {
           'Content-Type': 'application/json',
@@ -97,6 +141,8 @@ export function useFormLibrary () {
       story: '',
       description: '',
       contact: '',
+      sale_id: '',
+      credits: 0,
     })
     errorDialog.value = false
     errorMessage.value = ''
@@ -126,8 +172,10 @@ export function useFormLibrary () {
     storyRules,
     descriptionRules,
     contactRules,
+    idRules,
 
     // Methods
+    validateSaleId,
     submitForm,
     resetForm,
     closeSuccessDialog,

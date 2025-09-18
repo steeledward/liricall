@@ -1,40 +1,41 @@
 <template>
   <v-container max-width="600">
-    <v-card class="mx-auto" elevation="4">
-      <v-card-text class="text-center">
-        <v-row>
-          <v-col>
-            <v-btn
-              class="text-black"
-              color="#ffc000"
-              prepend-icon="mdi-library"
-              @click="goTolibrary"
-            >
-              Biblioteca
-            </v-btn>
-          </v-col>
-          <v-col>
-            <v-btn
-              class="text-black"
-              color="#ffc000"
-              prepend-icon="mdi-credit-card"
-              @click="goToOpenPay"
-            >
-              Pagar con tarjeta
-            </v-btn>
-          </v-col>
-        </v-row>
+    <!-- Show information -->
+    <v-card class="mb-5" elevation="4">
+      <v-card-text>
+        <v-alert color="primary" variant="outlined">
+          <span class="small" variant="outlined">
+            Realiza tu <router-link to="/payment">COMPRA</router-link> ficticia.
+            Guarda el número de <strong>ID</strong> y aplícalo para crear tú
+            canción gratis.
+          </span>
+        </v-alert>
       </v-card-text>
     </v-card>
-
     <v-card class="mx-auto" elevation="4">
-      <v-card-title class="text-h5 v-card-title-color text-black">
+      <v-card-title class="text-h5">
         <v-icon class="mr-2" icon="mdi-music" />
         Liricall - Tu Historia en una Canción
       </v-card-title>
 
       <v-card-text class="pa-6">
         <v-form ref="form" v-model="valid" @click="handleSubmit">
+
+          <!-- ID Field -->
+          <v-text-field
+            v-model="formData.sale_id"
+            class="mb-4"
+            clearable
+            :disabled="loading"
+            label="ID"
+            required
+            :rules="idRules"
+            variant="outlined"
+            @blur="handleValidateSaleId"
+          ><v-badge class="mr-5" color="primary" :content="formData.credits" location="top right">
+            <v-icon icon="mdi-credit-card" />
+          </v-badge></v-text-field>
+
           <!-- Title Field -->
           <v-text-field
             v-model="formData.title"
@@ -108,20 +109,16 @@
             <v-col cols="6">
               <v-btn
                 block
-                color="#FFC000"
-                :disabled="!valid || loading"
+                color="primary"
+                :disabled="!valid || loading || formData.credits == 0"
                 :loading="loading"
                 size="large"
               >
                 <template #loader>
-                  <v-progress-circular
-                    color="white"
-                    indeterminate
-                    size="24"
-                  />
+                  <v-progress-circular color="white" indeterminate size="24" />
                 </template>
                 <v-icon class="mr-2" icon="mdi-send" />
-                Enviar
+                Crear Canción
               </v-btn>
             </v-col>
           </v-row>
@@ -130,11 +127,7 @@
     </v-card>
 
     <!-- Success Dialog -->
-    <v-dialog
-      v-model="successDialog"
-      max-width="500"
-      @after-leave="resetForm"
-    >
+    <v-dialog v-model="successDialog" max-width="500" @after-leave="resetForm">
       <v-card>
         <v-card-title class="text-h6 v-card-title-color text-black">
           ¡Información enviada correctamente!
@@ -166,10 +159,7 @@
         </v-card-text>
         <v-card-actions>
           <v-spacer />
-          <v-btn
-            class="primary-color"
-            @click="closeErrorDialog"
-          >Close</v-btn>
+          <v-btn class="primary-color" @click="closeErrorDialog">Close</v-btn>
         </v-card-actions>
       </v-card>
     </v-dialog>
@@ -177,20 +167,9 @@
 </template>
 <script setup lang="js">
   import { ref } from 'vue'
-  import { useRouter } from 'vue-router'
   import { useFormLibrary } from '@/composables/useFormLibrary'
 
   const form = ref(null)
-
-  const router = useRouter()
-
-  function goToOpenPay () {
-    router.push({ path: '/openpay' })
-  }
-
-  function goTolibrary () {
-    router.push({ path: '/appsheet' })
-  }
 
   // Use the composable
   const {
@@ -204,6 +183,8 @@
     storyRules,
     descriptionRules,
     contactRules,
+    idRules,
+    validateSaleId,
     submitForm,
     resetForm: resetFormComposable,
     closeSuccessDialog,
@@ -214,8 +195,17 @@
   async function handleSubmit () {
     const { valid: formValid } = await form.value.validate()
 
-    if (formValid) {
+    if (formValid && formData.credits > 0) {
       await submitForm()
+    }
+  }
+
+  // Handle form submission
+  async function handleValidateSaleId () {
+    if (formData.sale_id) {
+      const data = await validateSaleId()
+      formData.credits = data.data.availables
+      console.log(data)
     }
   }
 
@@ -224,22 +214,13 @@
     resetFormComposable(form.value)
   }
 </script>
-
 <style scoped>
 .v-card {
-  margin-top: 2rem;
+  max-width: 700px;
+  margin: auto;
+  margin-top: 20px;
 }
-
-.v-text-field,
-.v-textarea {
-  margin-bottom: 1.5rem;
-}
-
-.v-card-title-color {
-  background-color: #ffc000;
-}
-
-.primary-color {
-  color: #ffc000;
+.small {
+  font-size: 12px;
 }
 </style>
