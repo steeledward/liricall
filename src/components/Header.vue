@@ -86,13 +86,7 @@
   }
 
   function setTheme (theme: string) {
-    const availableThemes = ['light', 'dark', 'system']
-
-    if (availableThemes.includes(theme)) {
-      themeStore.setTheme(theme)
-    } else {
-      themeStore.setTheme('system')
-    }
+    themeStore.setTheme('dark')
   }
 
   function logout () {
