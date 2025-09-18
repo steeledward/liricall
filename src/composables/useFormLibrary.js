@@ -12,10 +12,10 @@ export function useFormLibrary () {
   const errorMessage = ref('')
 
   const formData = reactive({
-    title: 'El Ingeniero de ACERO',
-    story: 'Era el Chaparrito De allá de la tierra que dicen que sí existe Decían que muy inteligente',
-    description: 'Norteño Banda reional Mexicano',
-    contact: 'steel.edward@gmail.com',
+    title: '',
+    story: '',
+    description: '',
+    contact: '',
     sale_id: '',
     credits: 0,
   })
