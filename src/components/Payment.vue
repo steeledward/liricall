@@ -470,6 +470,7 @@
         try {
           // POST sale to /api/sales
           const response = await api.post(`${apiHost}/api/sales`, payload)
+          console.log(response.data)
 
           charge.value = response.data.charge
           sale.value = response.data.sale

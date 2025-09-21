@@ -24,7 +24,7 @@ export const useThemeStore = defineStore('theme', () => {
     document.documentElement.dataset.theme = currentTheme.value
   })
 
-  const setTheme = (newTheme: 'light' | 'dark' | 'system') => {
+  const setTheme = (newTheme: 'light' | 'dark' | 'system', p0?: number) => {
     theme.value = newTheme
     localStorage.setItem('theme', newTheme)
   }
