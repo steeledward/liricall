@@ -465,6 +465,7 @@
           chargeData,
           customer,
         }
+        console.log(payload)
 
         // payment in OpenPay
         try {
