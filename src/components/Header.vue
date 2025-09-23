@@ -1,7 +1,9 @@
 <template>
   <v-app-bar app color="primary">
     <v-app-bar-title class="d-flex align-center">
-      <v-icon class="mr-2" icon="mdi-music" size="x-large" />
+      <RouterLink to="/">
+        <v-icon class="mr-2" color="secondary" icon="mdi-music" size="x-large" />
+      </RouterLink>
       <span class="font-weight-bold">{{ appName }}</span>
       <span class="ml-2 hidden-sm-and-down">{{ slogan }}</span>
     </v-app-bar-title>
@@ -86,7 +88,7 @@
   }
 
   function setTheme (theme: string) {
-    themeStore.setTheme('dark')
+    themeStore.setTheme(theme)
   }
 
   function logout () {

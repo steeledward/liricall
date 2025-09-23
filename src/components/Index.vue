@@ -4,10 +4,10 @@
     <v-card class="mb-5" elevation="4">
       <v-card-text>
         <v-alert color="primary" variant="outlined">
-          <span class="small" variant="outlined">
-            Realiza tu <router-link to="/payment">COMPRA</router-link> ficticia.
-            Guarda el número de <strong>ID</strong> y aplícalo para crear tú
-            canción gratis.
+          <span>
+            Realiza una compra ficticia.
+            Guarda el número de <strong>ID</strong> y aplícalo para crear <strong>Tú
+              Historia en una Canción</strong> gratis. <router-link to="payment"><v-icon color="primary" icon="mdi-credit-card" /></router-link>
           </span>
         </v-alert>
       </v-card-text>
@@ -129,8 +129,8 @@
     <!-- Success Dialog -->
     <v-dialog v-model="successDialog" max-width="500" @after-leave="resetForm">
       <v-card>
-        <v-card-title class="text-h6 v-card-title-color text-black">
-          ¡Información enviada correctamente!
+        <v-card-title>
+          ¡Tu Historia en una Canción enviada correctamente!
         </v-card-title>
         <v-card-text class="pa-4">
           <p><strong>Título:</strong> {{ formData.title }}</p>
@@ -165,9 +165,19 @@
     </v-dialog>
   </v-container>
 </template>
-<script setup lang="js">
+<script setup lang="ts">
   import { ref } from 'vue'
-  import { useFormLibrary } from '@/composables/useFormLibrary'
+  import { useRoute, useRouter } from 'vue-router'
+  import { useFormLibrary } from '@/composables/useFormIndex'
+
+  const router = useRouter()
+
+  interface QueryParams {
+    id?: string
+  }
+
+  const route = useRoute()
+  const query = route.query as QueryParams
 
   const form = ref(null)
 
@@ -191,6 +201,8 @@
     closeErrorDialog,
   } = useFormLibrary()
 
+  formData.sale_id = query.id
+
   // Handle form submission
   async function handleSubmit () {
     const { valid: formValid } = await form.value.validate()
@@ -205,13 +217,13 @@
     if (formData.sale_id) {
       const data = await validateSaleId()
       formData.credits = data.data.availables
-      console.log(data)
     }
   }
 
   // Reset form with form reference
   function resetForm () {
     resetFormComposable(form.value)
+    router.push('/')
   }
 </script>
 <style scoped>
@@ -219,8 +231,5 @@
   max-width: 700px;
   margin: auto;
   margin-top: 20px;
-}
-.small {
-  font-size: 12px;
 }
 </style>

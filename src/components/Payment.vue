@@ -4,7 +4,7 @@
       <v-card>
         <v-card-text>
           <v-alert color="primary" variant="outlined">
-            <span class="small" variant="outlined">
+            <span>
               Realiza tu compra ficticia. Guarda el <strong>ID</strong> y
               aplícalo para crear tú canción gratis.
             </span>
@@ -212,7 +212,7 @@
           </v-row>
           <v-row>
             <v-col cols="12" md="4">
-              <span class="small" type="info" variant="outlined">
+              <span type="info" variant="outlined">
                 Transacciones realizadas vía:
               </span>
               <a href="https://www.openpay.mx/" target="_blank">
@@ -225,7 +225,7 @@
             </v-col>
             <v-col cols="12" md="8">
               <v-alert variant="outlined">
-                <span class="small" variant="outlined">
+                <span>
                   Tus pagos se realizan de forma segura con encriptación de 256
                   bits
                 </span>
@@ -259,7 +259,7 @@
           <p><strong>Canciones:</strong> {{ quantiy }}</p>
           <p><strong>Autorización:</strong> {{ charge.authorization }}</p>
           <p>
-            <strong>ID:</strong><em style="color: #ffc000"> {{ charge.id }} </em>
+            <strong>ID:</strong><em style="color: #ffc000"><router-link :to="`/?id=${charge.id}`"> {{ charge.id }} </router-link></em>
           </p>
           <p><strong>Cliente:</strong> {{ sale.customer }}</p>
         </v-card-text>
@@ -296,15 +296,14 @@
 
 <script setup>
   import { onMounted, ref, watch } from 'vue'
-  import { useApi } from '@/composables/useApi'
+  import { useApi } from '@/utils/api.ts'
 
   const openpay_id = import.meta.env.VITE_OPENPAY_ID
   const openpay_key = import.meta.env.VITE_OPENPAY_PUBLIC_KEY
   const openpay_sandbox_mode
     = import.meta.env.VITE_OPENPAY_SANDBOX_MODE === 'true'
-  const apiHost = import.meta.env.VITE_API_BASE_URL
 
-  const { api } = useApi()
+  const api = useApi()
 
   const valid = ref(true)
   const processing = ref(false)
@@ -391,7 +390,7 @@
 
   async function fetchPackages () {
     try {
-      const response = await api.get(`${apiHost}/api/packages`)
+      const response = await api.get('/api/packages')
       packages.value = response.data
     } catch (error) {
       console.error('Error fetching packages:', error)
@@ -465,13 +464,11 @@
           chargeData,
           customer,
         }
-        console.log(payload)
 
         // payment in OpenPay
         try {
           // POST sale to /api/sales
-          const response = await api.post(`${apiHost}/api/sales`, payload)
-          console.log(response.data)
+          const response = await api.post('/api/sales', payload)
 
           charge.value = response.data.charge
           sale.value = response.data.sale
@@ -507,8 +504,5 @@
   max-width: 700px;
   margin: auto;
   margin-top: 20px;
-}
-.small {
-  font-size: 12px;
 }
 </style>
