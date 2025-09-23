@@ -173,7 +173,7 @@
   const router = useRouter()
 
   interface QueryParams {
-    id?: string
+    id?: string | undefined
   }
 
   const route = useRoute()
@@ -205,10 +205,12 @@
 
   // Handle form submission
   async function handleSubmit () {
-    const { valid: formValid } = await form.value.validate()
+    if (form.value) {
+      const { valid: formValid } = await (form.value as any).validate()
 
-    if (formValid && formData.credits > 0) {
-      await submitForm()
+      if (formValid && formData.credits > 0) {
+        await submitForm()
+      }
     }
   }
 
@@ -222,7 +224,7 @@
 
   // Reset form with form reference
   function resetForm () {
-    resetFormComposable(form.value)
+    resetFormComposable()
     router.push('/')
   }
 </script>

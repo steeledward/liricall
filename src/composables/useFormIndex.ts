@@ -11,11 +11,22 @@ export function useFormLibrary () {
   const errorDialog = ref(false)
   const errorMessage = ref('')
 
-  const formData = reactive({
+  interface interfaceFormData {
+    title: string
+    story: string
+    description: string
+    contact: string
+    quantity?: number
+    sale_id?: string
+    credits: number
+  }
+
+  const formData = reactive<interfaceFormData>({
     title: '',
     story: '',
     description: '',
     contact: '',
+    quantity: 0,
     sale_id: '',
     credits: 0,
   })
@@ -69,7 +80,7 @@ export function useFormLibrary () {
       } else {
         throw new Error(`Unexpected response status: ${response.status}`)
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error submitting form:', error)
 
       if (error.response) {
@@ -101,11 +112,8 @@ export function useFormLibrary () {
         quantiy: formData.quantity,
         createdAt: new Date().toISOString(),
         sale_id: formData.sale_id,
-      }, {
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      })
+      },
+      )
 
       if (response.status === 200 || response.status === 201) {
         successDialog.value = true
@@ -113,7 +121,7 @@ export function useFormLibrary () {
       } else {
         throw new Error(`Unexpected response status: ${response.status}`)
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error submitting form:', error)
 
       if (error.response) {
@@ -132,10 +140,7 @@ export function useFormLibrary () {
   }
 
   // Reset form
-  const resetForm = (formRef = null) => {
-    if (formRef) {
-      formRef.reset()
-    }
+  const resetForm = () => {
     Object.assign(formData, {
       title: '',
       story: '',
@@ -143,6 +148,7 @@ export function useFormLibrary () {
       contact: '',
       sale_id: '',
       credits: 0,
+      quantity: 0,
     })
     errorDialog.value = false
     errorMessage.value = ''

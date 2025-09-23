@@ -87,7 +87,7 @@
     localStorage.setItem('language', lang)
   }
 
-  function setTheme (theme: string) {
+  function setTheme (theme: any) {
     themeStore.setTheme(theme)
   }
 
