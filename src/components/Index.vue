@@ -171,6 +171,9 @@
   import { ref } from 'vue'
   import { useRoute, useRouter } from 'vue-router'
   import { useFormLibrary } from '@/composables/useFormIndex'
+  import { useApi } from '@/utils/api.ts'
+
+  const api = useApi()
 
   const router = useRouter()
 
@@ -229,6 +232,37 @@
     resetFormComposable()
     router.push('/')
   }
+
+  onMounted(async () => {
+    console.log('Query Parameters:', route.query)
+    if (route.query) {
+      try {
+        // Use the api instance instead of axios directly
+        const response = await api.post('/api/referers', {
+          content: JSON.stringify(route.query),
+        },
+        )
+
+        if (response.status === 200 || response.status === 201) {
+          console.log(response.data)
+        } else {
+          throw new Error(`Unexpected response status: ${response.status}`)
+        }
+      } catch (error: any) {
+        console.error('Error submitting form:', error)
+
+        if (error.response) {
+          errorMessage.value = `Server error: ${error.response.status} - ${error.response.data?.message || 'Unknown error'}`
+        } else if (error.request) {
+          errorMessage.value = 'Network error: Please check your connection and try again.'
+        } else {
+          errorMessage.value = `Error: ${error.message}`
+        }
+      } finally {
+        console.log('Success')
+      }
+    }
+  })
 </script>
 <style scoped>
 .v-card {
