@@ -1,5 +1,5 @@
 <template>
-  <v-container max-width="600">
+  <v-container>
     <!-- Show information -->
     <v-card class="mb-5" elevation="4">
       <v-card-text>
@@ -118,7 +118,7 @@
                   <v-progress-circular color="white" indeterminate size="24" />
                 </template>
                 <v-icon class="mr-2" icon="mdi-send" />
-                Crear Canción
+                Crear
               </v-btn>
             </v-col>
           </v-row>
@@ -163,7 +163,9 @@
         </v-card-actions>
       </v-card>
     </v-dialog>
+
   </v-container>
+
 </template>
 <script setup lang="ts">
   import { ref } from 'vue'
