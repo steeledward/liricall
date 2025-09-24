@@ -3,7 +3,7 @@
     <!-- Show information -->
     <v-card class="mb-5" elevation="4">
       <v-card-text>
-        <v-alert color="primary" variant="outlined">
+        <v-alert>
           <span>
             Realiza una compra ficticia.
             Guarda el número de <strong>ID</strong> y aplícalo para crear <strong>Tú

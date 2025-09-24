@@ -3,10 +3,10 @@
     <v-form ref="form" v-model="valid" lazy-validation @submit.prevent="pay">
       <v-card>
         <v-card-text>
-          <v-alert color="primary" variant="outlined">
+          <v-alert>
             <span>
-              Realiza tu compra ficticia. Guarda el <strong>ID</strong> y
-              aplícalo para crear tú canción gratis.
+              Realiza tu compra ficticia. Da clic en el <strong>ID</strong> y
+              crea <strong>Tu Historia en una Canción</strong> gratis.
             </span>
           </v-alert>
         </v-card-text>
@@ -234,19 +234,21 @@
           </v-row>
         </v-card-text>
         <v-divider thickness="1" />
-        <v-card-actions class="justify-end">
+        <v-card-text class="justify-end">
           <v-btn
-            class="black-text"
-            :color="colorButton"
+            block
+            color="primary"
             :disabled="!valid || processing"
-            prepend-icon="mdi-credit-card"
+            :loading="processing"
+            size="large"
             type="submit"
-            variant="tonal"
-          >
-            {{ mesageButton }}
-            <v-icon>{{ iconButton }}</v-icon>
+          ><template #loader>
+             <v-progress-circular color="white" indeterminate size="24" />
+           </template>
+            <v-icon class="mr-2" icon="mdi-credit-card" />
+            Proccesar Pago
           </v-btn>
-        </v-card-actions>
+        </v-card-text>
       </v-card>
     </v-form>
     <!-- Success Dialog -->
@@ -296,6 +298,7 @@
 
 <script setup>
   import { onMounted, ref, watch } from 'vue'
+  import { da } from 'vuetify/locale'
   import { useApi } from '@/utils/api.ts'
 
   const openpay_id = import.meta.env.VITE_OPENPAY_ID
@@ -331,9 +334,6 @@
 
   const token_id = ref('')
   const deviceSessionId = ref('')
-  const mesageButton = ref('Procesar pago')
-  const iconButton = ref('attach_money')
-  const colorButton = ref('yellow')
 
   const packages = ref([])
 
@@ -397,6 +397,25 @@
     }
   }
 
+  async function fetchFakeUser () {
+    try {
+      fetch('https://randomuser.me/api/?results=1&nat=mx')
+        .then(response => response.json())
+        .then(data => {
+          if (data.info.results == 1) {
+            name.value = data.results[0].name.first
+            last_name.value = data.results[0].name.last
+            name_titular.value = data.results[0].name.first + ' ' + data.results[0].name.last
+            email.value = data.results[0].email
+            phone_number.value = data.results[0].phone.replaceAll(' ', '').replaceAll('(', '').replaceAll(')', '')
+          }
+        })
+        .catch(error => console.error('Error fetching names:', error))
+    } catch (error) {
+      console.error('Error fetching packages:', error)
+    }
+  }
+
   onMounted(() => {
     // sistema anti-fraude
     OpenPay.setId(openpay_id)
@@ -406,13 +425,14 @@
     deviceSessionId.value = OpenPay.deviceData.setup()
 
     fetchPackages()
+    fetchFakeUser()
   })
 
   // Close dialogs
   function closeSuccessDialog () {
     successDialog.value = false
-    mesageButton.value = 'Procesar Pago'
     processing.value = false
+    fetchFakeUser()
   }
 
   function closeErrorDialog () {
@@ -425,10 +445,6 @@
     if (!valid.value) return
 
     processing.value = true
-
-    mesageButton.value = 'Procesando...'
-    iconButton.value = 'autorenew'
-    colorButton.value = 'grey'
 
     // generate token_id para realizar el cargo
     const dataPayment = {
@@ -475,16 +491,8 @@
 
           successDialog.value = true
 
-          mesageButton.value = 'Pagado'
-          iconButton.value = 'check_circle'
-          colorButton.value = 'green'
-
           processing.value = false
         } catch (error) {
-          mesageButton.value = 'Procesar pago'
-          iconButton.value = 'attach_money'
-          colorButton.value = 'yellow'
-
           processing.value = false
 
           errorMessage.value = error

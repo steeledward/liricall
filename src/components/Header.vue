@@ -2,7 +2,7 @@
   <v-app-bar app color="primary">
     <v-app-bar-title class="d-flex align-center">
       <RouterLink to="/">
-        <v-icon class="mr-2" color="secondary" icon="mdi-music" size="x-large" />
+        <v-icon class="mr-2" color="black" icon="mdi-music" size="x-large" />
       </RouterLink>
       <span class="font-weight-bold">{{ appName }}</span>
       <span class="ml-2 hidden-sm-and-down">{{ slogan }}</span>
