@@ -39,6 +39,6 @@ export function useApi () {
     get: (url: string, params?: any) => api.get(url, { params }),
     post: (url: string, data?: any) => api.post(url, data),
     put: (url: string, data?: any) => api.put(url, data),
-    delete: (url: string) => api.delete(url),
+    delete: (url: string, data?: any) => api.delete(url, data),
   }
 }
