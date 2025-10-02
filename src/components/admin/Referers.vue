@@ -65,7 +65,7 @@
         :timeout="-1"
       >
         <div class="d-flex align-center">
-          <span>Are you sure you want to delete this item? {{ selectedReferer?.Title }}</span>
+          <span>Are you sure you want to delete this item?</span>
           <v-spacer />
           <v-btn
             class="ml-2"
@@ -178,7 +178,7 @@
 
   function editReferer (referer: Referer): void {
     console.log('Edit referer:', referer)
-    showSnackbar(`Editing referer: ${referer.Title}`, 'info')
+    showSnackbar(`Editing referer: ${referer.content}`, 'info')
   // Implement edit functionality
   }
 
