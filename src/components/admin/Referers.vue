@@ -131,8 +131,8 @@
       const response = await api.get('/api/referers/paged', {
         page: page.value,
         limit: itemsPerPage.value,
+        search: search.value,
       })
-      console.log(response.data)
 
       referers.value = response.data.referers
       totalReferers.value = response.data.total
@@ -174,7 +174,6 @@
   }
 
   function editReferer (referer: Referer): void {
-    console.log('Edit referer:', referer)
     showSnackbar(`Editing referer: ${referer.content}`, 'info')
   // Implement edit functionality
   }

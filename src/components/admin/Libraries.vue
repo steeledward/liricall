@@ -145,6 +145,7 @@
       const response = await api.get('/api/libraries/paged', {
         page: page.value,
         limit: itemsPerPage.value,
+        search: search.value,
       })
 
       libraries.value = response.data.libraries
