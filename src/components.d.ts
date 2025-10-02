@@ -8,6 +8,7 @@ export {}
 /* prettier-ignore */
 declare module 'vue' {
   export interface GlobalComponents {
+    copy: typeof import('./components/admin/Libraries copy.vue')['default']
     Footer: typeof import('./components/Footer.vue')['default']
     GlobalSnackbar: typeof import('./components/GlobalSnackbar.vue')['default']
     Header: typeof import('./components/Header.vue')['default']
@@ -15,6 +16,7 @@ declare module 'vue' {
     Libraries: typeof import('./components/admin/Libraries.vue')['default']
     Payment: typeof import('./components/Payment.vue')['default']
     PublicAppSheet: typeof import('./components/PublicAppSheet.vue')['default']
+    Referers: typeof import('./components/admin/Referers.vue')['default']
     RouterLink: typeof import('vue-router')['RouterLink']
     RouterView: typeof import('vue-router')['RouterView']
     SocialLogin: typeof import('./components/Auth/SocialLogin.vue')['default']

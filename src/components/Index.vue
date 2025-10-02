@@ -234,7 +234,6 @@
   }
 
   onMounted(async () => {
-    console.log('Query Parameters:', route.query)
     if (route.query) {
       try {
         // Use the api instance instead of axios directly
