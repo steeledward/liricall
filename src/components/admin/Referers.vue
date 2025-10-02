@@ -120,13 +120,9 @@
   // Table headers with proper typing
   const headers = ref<DataTableHeader[]>([
     { title: 'Content', key: 'content', sortable: true },
-    { title: 'createdAt', key: 'Date', sortable: true },
+    { title: 'createdAt', key: 'createdAt', sortable: true },
     { title: 'Actions', key: 'actions', sortable: false },
   ])
-
-  function sliceString (fullString: string) {
-    return fullString ? fullString.toString().slice(0, 20) : ''
-  }
 
   // Methods
   async function fetchReferers (): Promise<void> {
@@ -136,6 +132,7 @@
         page: page.value,
         limit: itemsPerPage.value,
       })
+      console.log(response.data)
 
       referers.value = response.data.referers
       totalReferers.value = response.data.total
