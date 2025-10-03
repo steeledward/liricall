@@ -1,103 +1,189 @@
 <template>
-  <v-container>
-    <v-card>
-      <v-card-title>
-        <v-row>
-          <v-col cols="12" md="6">
-            <v-text-field
-              v-model="search"
-              append-icon="mdi-magnify"
-              hide-details
-              label="Search"
-              single-line
-              @input="onSearch"
-            />
-          </v-col>
-          <v-col class="text-right" cols="12" md="6">
-            <v-btn color="primary" :loading="loading" @click="fetchLibraries">
-              <v-icon left>mdi-refresh</v-icon>
-              Refresh
-            </v-btn>
-          </v-col>
-        </v-row>
-      </v-card-title>
+  <v-app>
+    <v-main>
+      <v-container>
+        <!-- Table View -->
+        <v-card>
+          <v-card-title>
+            <v-row>
+              <v-col cols="12" md="6">
+                <v-text-field
+                  v-model="search"
+                  append-icon="mdi-magnify"
+                  hide-details
+                  label="Search"
+                  single-line
+                  @input="onSearch"
+                />
+              </v-col>
+              <v-col class="text-right" cols="12" md="6">
+                <v-btn color="primary" :loading="loading" @click="fetchLibraries">
+                  <v-icon left>mdi-refresh</v-icon>
+                  Refresh
+                </v-btn>
+              </v-col>
+            </v-row>
+          </v-card-title>
 
-      <v-data-table-server
-        v-model:items-per-page="itemsPerPage"
-        v-model:page="page"
-        class="elevation-1 mt-4"
-        :headers="headers"
-        item-value="_id"
-        :items="libraries"
-        :items-length="totalLibraries"
-        :loading="loading"
-        :search="search"
-        true
-        @update:options="fetchLibraries"
-      >
-        <template #item.Title="{ item }">
-          {{ item.Title }}
-        </template>
-
-        <template #item.Story="{ item }">
-          {{ sliceString(item.Story) }}
-        </template>
-
-        <template #item.Lyric="{ item }">
-          {{ sliceString(item.Lyric) }}
-        </template>
-
-        <template #item.Date="{ item }">
-          {{ item.Date }}
-        </template>
-
-        <template #item.actions="{ item }">
-          <v-icon class="mr-2" color="primary" small @click="editLibrary(item)">
-            mdi-pencil
-          </v-icon>
-          <v-icon color="error" small @click="confirmDeleteLibrary(item)">
-            mdi-delete
-          </v-icon>
-        </template>
-
-        <template #no-data>
-          <v-btn color="primary" @click="fetchLibraries"> Reset </v-btn>
-        </template>
-      </v-data-table-server>
-
-      <!-- Confirmation Snackbar -->
-      <v-snackbar
-        v-model="showConfirmDelete"
-        color="primary"
-        multi-line
-        :timeout="-1"
-      >
-        <div class="d-flex align-center">
-          <span>Are you sure you want to delete this item? {{ selectedLibrary?.Title }}</span>
-          <v-spacer />
-          <v-btn
-            class="ml-2"
-            color="secondary"
-            text
-            @click="showConfirmDelete=false"
+          <v-data-table-server
+            v-model:items-per-page="itemsPerPage"
+            v-model:page="page"
+            class="elevation-1 mt-4"
+            :headers="headers"
+            item-value="_id"
+            :items="libraries"
+            :items-length="totalLibraries"
+            :loading="loading"
+            :search="search"
+            true
+            @update:options="fetchLibraries"
           >
-            Cancel
-          </v-btn>
-          <v-btn
-            class="ml-2"
-            color="error"
-            @click="deleteLibrary()"
+            <template #item.title="{ item }">
+              {{ item.title }}
+            </template>
+
+            <template #item.story="{ item }">
+              {{ sliceString(item.story) }}
+            </template>
+
+            <template #item.lyric="{ item }">
+              {{ sliceString(item.lyric) }}
+            </template>
+
+            <template #item.date="{ item }">
+              {{ item.date }}
+            </template>
+
+            <template #item.actions="{ item }">
+              <v-icon class="mr-2" color="primary" small @click="editLibrary(item)">
+                mdi-pencil
+              </v-icon>
+              <v-icon color="error" small @click="confirmDeleteLibrary(item)">
+                mdi-delete
+              </v-icon>
+            </template>
+
+            <template #no-data>
+              <v-btn color="primary" @click="fetchLibraries"> Reset </v-btn>
+            </template>
+          </v-data-table-server>
+
+          <!-- Confirmation Snackbar -->
+          <v-snackbar
+            v-model="showConfirmDelete"
+            color="primary"
+            multi-line
+            :timeout="-1"
           >
-            Delete
-          </v-btn>
+            <div class="d-flex align-center">
+              <span>Are you sure you want to delete this item? {{ selectedLibrary?.title }}</span>
+              <v-spacer />
+              <v-btn
+                class="ml-2"
+                color="secondary"
+                text
+                @click="showConfirmDelete=false"
+              >
+                Cancel
+              </v-btn>
+              <v-btn
+                class="ml-2"
+                color="error"
+                @click="deleteLibrary()"
+              >
+                Delete
+              </v-btn>
+            </div>
+          </v-snackbar>
+
+          <v-snackbar v-model="snackbar.show" :color="snackbar.color">
+            {{ snackbar.message }}
+          </v-snackbar>
+        </v-card>
+        <!-- Edit Form Sidebar -->
+        <!-- Overlay Background -->
+        <div
+          v-if="formVisible"
+          class="overlay-background"
+          @click="formVisible=false"
+        />
+
+        <!-- Slide-out Form Overlay -->
+        <div
+          class="form-overlay"
+          :class="{ 'form-overlay--visible': formVisible }"
+        >
+          <v-card class="form-card">
+            <v-card-title class="d-flex justify-space-between align-center">
+              <span class="text-h6">{{ selectedLibrary?.title }}</span>
+              <v-btn class="close-btn" icon @click="formVisible=false">
+                <v-icon>mdi-close</v-icon>
+              </v-btn>
+            </v-card-title>
+
+            <v-divider />
+
+            <v-card-text class="pa-6">
+              <v-form ref="form" v-model="valid" lazy-validation>
+                <v-row>
+                  <v-col cols="12">
+                    <v-text-field
+                      v-model="title"
+                      label="Title"
+                      required
+                      :rules="[v => !!v || 'Title is required']"
+                      variant="outlined"
+                    />
+                  </v-col>
+                  <v-col cols="12">
+                    <v-textarea
+                      v-model="story"
+                      label="Story"
+                      required
+                      rows="5"
+                      :rules="[v => !!v || 'Story is required']"
+                      variant="outlined"
+                    />
+                  </v-col>
+                  <v-col cols="12">
+                    <v-textarea
+                      v-model="lyric"
+                      label="Lyric"
+                      required
+                      rows="5"
+                      :rules="[v => !!v || 'Lyric is required']"
+                      variant="outlined"
+                    />
+                  </v-col>
+                </v-row>
+              </v-form>
+            </v-card-text>
+
+            <v-divider />
+
+            <v-card-actions class="pa-4">
+              <v-spacer />
+              <v-btn
+                class="mr-3"
+                variant="outlined"
+                @click="formVisible=false"
+              >
+                Cancel
+              </v-btn>
+              <v-btn
+                color="primary"
+                :disabled="!valid"
+                :loading="saving"
+                @click="addUpdateLibrary"
+              >
+                {{ selectedLibrary ? 'Update' : 'Add' }}
+              </v-btn>
+            </v-card-actions>
+          </v-card>
         </div>
-      </v-snackbar>
-
-      <v-snackbar v-model="snackbar.show" :color="snackbar.color">
-        {{ snackbar.message }}
-      </v-snackbar>
-    </v-card>
-  </v-container>
+      </v-container>
+    </v-main>
+  </v-app>
 </template>
 <script setup lang="ts">
   import type { DataTableHeader } from 'vuetify'
@@ -118,6 +204,13 @@
   const selectedLibrary = ref<Library>()
   const showConfirmDelete = ref<boolean>(false)
 
+  const formVisible = ref<boolean>(false)
+  const title = ref<string>('')
+  const story = ref<string>('')
+  const lyric = ref<string>('')
+  const valid = ref<boolean>(false)
+  const saving = ref(false)
+
   // Snackbar for notifications
   const snackbar = ref({
     show: false,
@@ -127,10 +220,10 @@
 
   // Table headers with proper typing
   const headers = ref<DataTableHeader[]>([
-    { title: 'Title', key: 'Title', sortable: true },
-    { title: 'Story', key: 'Story', sortable: true },
-    { title: 'Lyric', key: 'Lyric', sortable: true },
-    { title: 'Date', key: 'Date', sortable: true },
+    { title: 'Title', key: 'title', sortable: true },
+    { title: 'Story', key: 'story', sortable: true },
+    { title: 'Lyric', key: 'lyric', sortable: true },
+    { title: 'Date', key: 'date', sortable: true },
     { title: 'Actions', key: 'actions', sortable: false },
   ])
 
@@ -182,15 +275,55 @@
     }
   }
 
+  async function updateLibrary (): Promise<void> {
+    if (selectedLibrary.value) {
+      loading.value = true
+      try {
+        const response = await api.put('/api/libraries/' + selectedLibrary.value?._id, {
+          _id: selectedLibrary.value?._id,
+          title: title.value,
+          story: story.value,
+          lyric: lyric.value,
+        })
+
+        if (response.status === 200 || response.status === 201) {
+          showSnackbar('Library updated', 'primary')
+          fetchLibraries()
+          formVisible.value = false
+          selectedLibrary.value = undefined
+        } else {
+          throw new Error(`Unexpected response status: ${response.status}`)
+        }
+      } catch (error) {
+        console.error('Error deleting libraries:', error)
+        showSnackbar('Error deleting library', 'error')
+        showConfirmDelete.value = false
+      } finally {
+        loading.value = false
+      }
+    }
+  }
+
+  function addUpdateLibrary () {
+    if (selectedLibrary.value) {
+      updateLibrary()
+    }
+  }
+
   function onSearch (): void {
     page.value = 1
     fetchLibraries()
   }
 
   function editLibrary (library: Library): void {
-    console.log('Edit library:', library)
-    showSnackbar(`Editing library: ${library.Title}`, 'info')
-  // Implement edit functionality
+    // Implement edit functionality
+    selectedLibrary.value = library
+
+    title.value = library.title
+    story.value = library.story
+    lyric.value = library.lyric
+
+    formVisible.value = true
   }
 
   function confirmDeleteLibrary (library: Library): void {
@@ -212,3 +345,91 @@
     fetchLibraries()
   })
 </script>
+<style scoped>
+.overlay-background {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  z-index: 999;
+  animation: fadeIn 0.3s ease;
+}
+
+.form-overlay {
+  position: fixed;
+  top: 0;
+  right: -600px;
+  width: 600px;
+  height: 100vh;
+  background: white;
+  z-index: 1000;
+  transition: right 0.3s ease;
+  overflow-y: auto;
+  box-shadow: -2px 0 8px rgba(0, 0, 0, 0.15);
+}
+
+.form-overlay--visible {
+  right: 0;
+}
+
+.form-card {
+  height: 100vh;
+  border-radius: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.form-card .v-card-text {
+  flex: 1;
+  overflow-y: auto;
+}
+
+.close-btn {
+  transition: transform 0.2s ease;
+}
+
+.close-btn:hover {
+  transform: rotate(90deg);
+}
+
+.v-data-table {
+  cursor: pointer;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+  .form-overlay {
+    width: 100vw;
+    right: -100vw;
+  }
+}
+
+/* Custom scrollbar for form */
+.form-card .v-card-text::-webkit-scrollbar {
+  width: 6px;
+}
+
+.form-card .v-card-text::-webkit-scrollbar-track {
+  background: #f1f1f1;
+}
+
+.form-card .v-card-text::-webkit-scrollbar-thumb {
+  background: #c1c1c1;
+  border-radius: 3px;
+}
+
+.form-card .v-card-text::-webkit-scrollbar-thumb:hover {
+  background: #a8a8a8;
+}
+</style>

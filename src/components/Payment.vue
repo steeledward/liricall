@@ -1,299 +1,303 @@
 <template>
-  <v-container>
-    <v-form ref="form" v-model="valid" lazy-validation @submit.prevent="pay">
-      <v-card>
-        <v-card-text>
-          <v-alert>
-            <span>
-              Realiza tu compra ficticia. Da clic en el <strong>ID</strong> y
-              crea <strong>Tu Historia en una Canción</strong> gratis.
-            </span>
-          </v-alert>
-        </v-card-text>
-      </v-card>
-      <v-card>
-        <v-card-title>Paquetes LIRICALL</v-card-title>
-        <v-divider thickness="1" />
-        <v-card-text>
-          <v-row>
-            <v-col cols="12" md="6">
-              <v-select
-                v-model="packageSelected"
-                item-title="package"
-                item-value="_id"
-                :items="packages"
-                label="Selecciona un paquete"
-                required
-                :rules="[(v) => !!v || 'Seleccione paquete']"
-              />
-            </v-col>
-            <v-col cols="12" md="6">
-              <v-text-field
-                v-model="amount"
-                label="Cantidad a pagar (MXN)"
-                readonly
-                :rules="[(v) => !!v || 'Seleccione paquete']"
-                type="text"
-              />
-            </v-col>
-          </v-row>
-        </v-card-text>
-      </v-card>
-      <v-card>
-        <v-card-title>Datos del cliente</v-card-title>
-        <v-divider thickness="1" />
-        <v-card-text>
-          <v-row>
-            <v-col cols="12" md="6">
-              <v-text-field
-                v-model="name"
-                autocomplete="off"
-                label="Nombres"
-                required
-                :rules="[(v) => !!v || 'El nombre del cliente es requerido']"
-                type="text"
-              />
-            </v-col>
-            <v-col cols="12" md="6">
-              <v-text-field
-                v-model="last_name"
-                autocomplete="off"
-                label="Apellidos"
-                name="last_name"
-                required
-                :rules="[(v) => !!v || 'El apellido del cliente es requerido']"
-                type="text"
-              />
-            </v-col>
-          </v-row>
-          <v-row>
-            <v-col cols="12" md="6">
-              <v-text-field
-                v-model="phone_number"
-                autocomplete="off"
-                label="Teléfono"
-                required
-                :rules="[(v) => !!v || 'El teléfono del cliente es requerido']"
-                type="text"
-              />
-            </v-col>
-            <v-col cols="12" md="6">
-              <v-text-field
-                v-model="email"
-                autocomplete="off"
-                label="Email"
-                required
-                :rules="emailRules"
-                type="email"
-              />
-            </v-col>
-          </v-row>
-        </v-card-text>
-      </v-card>
-      <v-card>
-        <v-card-title>Tarjeta de crédito o débito</v-card-title>
-        <v-divider thickness="1" />
-        <v-card-text>
-          <v-row>
-            <v-col cols="12" md="6">
-              <div>
-                <span type="info" variant="outlined">
-                  Tarjetas de crédito
-                </span>
-                <v-img
-                  alt="Tarjetas de Crédito"
-                  class="mt-4"
-                  src="/src/assets/openpay/cards1.png"
-                  width="209px"
-                />
-              </div>
-            </v-col>
-            <v-col cols="12" md="6">
-              <div>
-                <span type="info" variant="outlined"> Tarjetas de débito </span>
-                <v-img
-                  alt="Tarjetas de Débito"
-                  class="mt-4"
-                  src="/src/assets/openpay/cards2.png"
-                  width="540px"
-                />
-              </div>
-            </v-col>
-          </v-row>
-          <v-row>
-            <v-col cols="12" md="6">
-              <v-text-field
-                v-model="name_titular"
-                autocomplete="off"
-                label="Nombre del titular"
-                required
-                :rules="[(v) => !!v || 'El nombre del titular es requerido']"
-                type="text"
-              />
-            </v-col>
-            <v-col cols="12" md="6">
-              <v-text-field
-                v-model="number_card"
-                autocomplete="off"
-                label="Número de tarjeta"
-                :mask="mask_credit_card"
-                name="number_card"
-                required
-                :rules="[(v) => !!v || 'El número de tarjeta es requerido']"
-                type="text"
-              />
-            </v-col>
-          </v-row>
-          <v-row>
-            <v-col cols="12" md="6">
-              <v-row>
-                <v-col cols="12">
-                  <span
-                    type="info"
-                    variant="outlined"
-                  >Fecha de expiración</span>
-                </v-col>
-              </v-row>
-              <v-row>
-                <v-col cols="7">
-                  <v-select
-                    v-model="month_expiration"
-                    item-title="text"
-                    item-value="value"
-                    :items="items_months"
-                    label="MES"
-                    required
-                    :rules="[(v) => !!v || 'El mes de expiración es requerido']"
-                  />
-                </v-col>
-                <v-col cols="5">
-                  <v-text-field
-                    v-model="year_expiration"
-                    label="AÑO"
-                    required
-                    :rules="rules_year"
-                    type="number"
-                  />
-                </v-col>
-              </v-row>
-            </v-col>
-            <v-col cols="12" md="6">
-              <v-row>
-                <v-col cols="12">
-                  <v-label
-                    for="cvc"
-                    type="info"
-                    variant="outlined"
-                  >Código de seguridad (CVV)</v-label>
-                </v-col>
-              </v-row>
-              <v-row>
-                <v-col cols="5">
-                  <v-text-field
-                    id="cvc"
-                    v-model="cvv2"
-                    autocomplete="off"
-                    label="CVC"
-                    name="cvc"
-                    required
-                    :rules="[rules_cvc.required, rules_cvc.min, rules_cvc.max]"
-                    type="number"
-                  />
-                </v-col>
-                <v-col class="" cols="7">
-                  <v-img
-                    alt="CVV"
-                    class="mt-4"
-                    src="/src/assets/openpay/cvv.png"
-                  />
-                </v-col>
-              </v-row>
-            </v-col>
-          </v-row>
-          <v-row>
-            <v-col cols="12" md="4">
-              <span type="info" variant="outlined">
-                Transacciones realizadas vía:
-              </span>
-              <a href="https://www.openpay.mx/" target="_blank">
-                <v-img
-                  alt="Opepay image"
-                  height="40px"
-                  src="/src/assets/openpay/openpay.png"
-                />
-              </a>
-            </v-col>
-            <v-col cols="12" md="8">
-              <v-alert variant="outlined">
+  <v-app>
+    <v-main>
+      <v-container>
+        <v-form ref="form" v-model="valid" lazy-validation @submit.prevent="pay">
+          <v-card>
+            <v-card-text>
+              <v-alert>
                 <span>
-                  Tus pagos se realizan de forma segura con encriptación de 256
-                  bits
+                  Realiza tu compra ficticia. Da clic en el <strong>ID</strong> y
+                  crea <strong>Tu Historia en una Canción</strong> gratis.
                 </span>
               </v-alert>
-            </v-col>
-          </v-row>
-        </v-card-text>
-        <v-divider thickness="1" />
-        <v-card-text class="justify-end">
-          <v-btn
-            block
-            color="primary"
-            :disabled="!valid || processing"
-            :loading="processing"
-            size="large"
-            type="submit"
-          ><template #loader>
-             <v-progress-circular color="white" indeterminate size="24" />
-           </template>
-            <v-icon class="mr-2" icon="mdi-credit-card" />
-            Proccesar Pago
-          </v-btn>
-        </v-card-text>
-      </v-card>
-    </v-form>
-    <!-- Success Dialog -->
-    <v-dialog v-model="successDialog" max-width="500">
-      <v-card>
-        <v-card-title>¡Venta registrada exitósamente!</v-card-title>
-        <v-card-text>
-          <p><strong>Descripción:</strong> {{ description }}</p>
-          <p><strong>Precio:</strong> {{ amount }}</p>
-          <p><strong>Canciones:</strong> {{ quantiy }}</p>
-          <p><strong>Autorización:</strong> {{ charge.authorization }}</p>
-          <p>
-            <strong>ID:</strong><em style="color: #ffc000"><router-link :to="`/?id=${charge.id}`"> {{ charge.id }} </router-link></em>
-          </p>
-          <p><strong>Cliente:</strong> {{ sale.customer }}</p>
-        </v-card-text>
-        <v-card-actions>
-          <v-spacer />
-          <v-btn
-            class="primary-color"
-            @click="closeSuccessDialog"
-          >Enterado</v-btn>
-        </v-card-actions>
-      </v-card>
-    </v-dialog>
-    <!-- Error Dialog -->
-    <v-dialog v-model="errorDialog" max-width="500">
-      <v-card>
-        <v-card-title>
-          <v-icon class="mr-2" icon="mdi-alert-circle" />
-          Ha ocurrido un error inesperado
-        </v-card-title>
-        <v-card-text class="pa-4">
-          <p>{{ errorMessage }}</p>
-        </v-card-text>
-        <v-card-actions>
-          <v-spacer />
-          <v-btn
-            class="primary-color"
-            @click="closeErrorDialog"
-          >Enterado</v-btn>
-        </v-card-actions>
-      </v-card>
-    </v-dialog>
-  </v-container>
+            </v-card-text>
+          </v-card>
+          <v-card>
+            <v-card-title>Paquetes LIRICALL</v-card-title>
+            <v-divider thickness="1" />
+            <v-card-text>
+              <v-row>
+                <v-col cols="12" md="6">
+                  <v-select
+                    v-model="packageSelected"
+                    item-title="package"
+                    item-value="_id"
+                    :items="packages"
+                    label="Selecciona un paquete"
+                    required
+                    :rules="[(v) => !!v || 'Seleccione paquete']"
+                  />
+                </v-col>
+                <v-col cols="12" md="6">
+                  <v-text-field
+                    v-model="amount"
+                    label="Cantidad a pagar (MXN)"
+                    readonly
+                    :rules="[(v) => !!v || 'Seleccione paquete']"
+                    type="text"
+                  />
+                </v-col>
+              </v-row>
+            </v-card-text>
+          </v-card>
+          <v-card>
+            <v-card-title>Datos del cliente</v-card-title>
+            <v-divider thickness="1" />
+            <v-card-text>
+              <v-row>
+                <v-col cols="12" md="6">
+                  <v-text-field
+                    v-model="name"
+                    autocomplete="off"
+                    label="Nombres"
+                    required
+                    :rules="[(v) => !!v || 'El nombre del cliente es requerido']"
+                    type="text"
+                  />
+                </v-col>
+                <v-col cols="12" md="6">
+                  <v-text-field
+                    v-model="last_name"
+                    autocomplete="off"
+                    label="Apellidos"
+                    name="last_name"
+                    required
+                    :rules="[(v) => !!v || 'El apellido del cliente es requerido']"
+                    type="text"
+                  />
+                </v-col>
+              </v-row>
+              <v-row>
+                <v-col cols="12" md="6">
+                  <v-text-field
+                    v-model="phone_number"
+                    autocomplete="off"
+                    label="Teléfono"
+                    required
+                    :rules="[(v) => !!v || 'El teléfono del cliente es requerido']"
+                    type="text"
+                  />
+                </v-col>
+                <v-col cols="12" md="6">
+                  <v-text-field
+                    v-model="email"
+                    autocomplete="off"
+                    label="Email"
+                    required
+                    :rules="emailRules"
+                    type="email"
+                  />
+                </v-col>
+              </v-row>
+            </v-card-text>
+          </v-card>
+          <v-card>
+            <v-card-title>Tarjeta de crédito o débito</v-card-title>
+            <v-divider thickness="1" />
+            <v-card-text>
+              <v-row>
+                <v-col cols="12" md="6">
+                  <div>
+                    <span type="info" variant="outlined">
+                      Tarjetas de crédito
+                    </span>
+                    <v-img
+                      alt="Tarjetas de Crédito"
+                      class="mt-4"
+                      src="/src/assets/openpay/cards1.png"
+                      width="209px"
+                    />
+                  </div>
+                </v-col>
+                <v-col cols="12" md="6">
+                  <div>
+                    <span type="info" variant="outlined"> Tarjetas de débito </span>
+                    <v-img
+                      alt="Tarjetas de Débito"
+                      class="mt-4"
+                      src="/src/assets/openpay/cards2.png"
+                      width="540px"
+                    />
+                  </div>
+                </v-col>
+              </v-row>
+              <v-row>
+                <v-col cols="12" md="6">
+                  <v-text-field
+                    v-model="name_titular"
+                    autocomplete="off"
+                    label="Nombre del titular"
+                    required
+                    :rules="[(v) => !!v || 'El nombre del titular es requerido']"
+                    type="text"
+                  />
+                </v-col>
+                <v-col cols="12" md="6">
+                  <v-text-field
+                    v-model="number_card"
+                    autocomplete="off"
+                    label="Número de tarjeta"
+                    :mask="mask_credit_card"
+                    name="number_card"
+                    required
+                    :rules="[(v) => !!v || 'El número de tarjeta es requerido']"
+                    type="text"
+                  />
+                </v-col>
+              </v-row>
+              <v-row>
+                <v-col cols="12" md="6">
+                  <v-row>
+                    <v-col cols="12">
+                      <span
+                        type="info"
+                        variant="outlined"
+                      >Fecha de expiración</span>
+                    </v-col>
+                  </v-row>
+                  <v-row>
+                    <v-col cols="7">
+                      <v-select
+                        v-model="month_expiration"
+                        item-title="text"
+                        item-value="value"
+                        :items="items_months"
+                        label="MES"
+                        required
+                        :rules="[(v) => !!v || 'El mes de expiración es requerido']"
+                      />
+                    </v-col>
+                    <v-col cols="5">
+                      <v-text-field
+                        v-model="year_expiration"
+                        label="AÑO"
+                        required
+                        :rules="rules_year"
+                        type="number"
+                      />
+                    </v-col>
+                  </v-row>
+                </v-col>
+                <v-col cols="12" md="6">
+                  <v-row>
+                    <v-col cols="12">
+                      <v-label
+                        for="cvc"
+                        type="info"
+                        variant="outlined"
+                      >Código de seguridad (CVV)</v-label>
+                    </v-col>
+                  </v-row>
+                  <v-row>
+                    <v-col cols="5">
+                      <v-text-field
+                        id="cvc"
+                        v-model="cvv2"
+                        autocomplete="off"
+                        label="CVC"
+                        name="cvc"
+                        required
+                        :rules="[rules_cvc.required, rules_cvc.min, rules_cvc.max]"
+                        type="number"
+                      />
+                    </v-col>
+                    <v-col class="" cols="7">
+                      <v-img
+                        alt="CVV"
+                        class="mt-4"
+                        src="/src/assets/openpay/cvv.png"
+                      />
+                    </v-col>
+                  </v-row>
+                </v-col>
+              </v-row>
+              <v-row>
+                <v-col cols="12" md="4">
+                  <span type="info" variant="outlined">
+                    Transacciones realizadas vía:
+                  </span>
+                  <a href="https://www.openpay.mx/" target="_blank">
+                    <v-img
+                      alt="Opepay image"
+                      height="40px"
+                      src="/src/assets/openpay/openpay.png"
+                    />
+                  </a>
+                </v-col>
+                <v-col cols="12" md="8">
+                  <v-alert variant="outlined">
+                    <span>
+                      Tus pagos se realizan de forma segura con encriptación de 256
+                      bits
+                    </span>
+                  </v-alert>
+                </v-col>
+              </v-row>
+            </v-card-text>
+            <v-divider thickness="1" />
+            <v-card-text class="justify-end">
+              <v-btn
+                block
+                color="primary"
+                :disabled="!valid || processing"
+                :loading="processing"
+                size="large"
+                type="submit"
+              ><template #loader>
+                 <v-progress-circular color="white" indeterminate size="24" />
+               </template>
+                <v-icon class="mr-2" icon="mdi-credit-card" />
+                Proccesar Pago
+              </v-btn>
+            </v-card-text>
+          </v-card>
+        </v-form>
+        <!-- Success Dialog -->
+        <v-dialog v-model="successDialog" max-width="500">
+          <v-card>
+            <v-card-title>¡Venta registrada exitósamente!</v-card-title>
+            <v-card-text>
+              <p><strong>Descripción:</strong> {{ description }}</p>
+              <p><strong>Precio:</strong> {{ amount }}</p>
+              <p><strong>Canciones:</strong> {{ quantiy }}</p>
+              <p><strong>Autorización:</strong> {{ charge.authorization }}</p>
+              <p>
+                <strong>ID:</strong><em style="color: #ffc000"><router-link :to="`/?id=${charge.id}`"> {{ charge.id }} </router-link></em>
+              </p>
+              <p><strong>Cliente:</strong> {{ sale.customer }}</p>
+            </v-card-text>
+            <v-card-actions>
+              <v-spacer />
+              <v-btn
+                class="primary-color"
+                @click="closeSuccessDialog"
+              >Enterado</v-btn>
+            </v-card-actions>
+          </v-card>
+        </v-dialog>
+        <!-- Error Dialog -->
+        <v-dialog v-model="errorDialog" max-width="500">
+          <v-card>
+            <v-card-title>
+              <v-icon class="mr-2" icon="mdi-alert-circle" />
+              Ha ocurrido un error inesperado
+            </v-card-title>
+            <v-card-text class="pa-4">
+              <p>{{ errorMessage }}</p>
+            </v-card-text>
+            <v-card-actions>
+              <v-spacer />
+              <v-btn
+                class="primary-color"
+                @click="closeErrorDialog"
+              >Enterado</v-btn>
+            </v-card-actions>
+          </v-card>
+        </v-dialog>
+      </v-container>
+    </v-main>
+  </v-app>
 </template>
 
 <script setup>

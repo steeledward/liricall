@@ -1,11 +1,11 @@
 // src/interfaces/User.interface.ts
 export interface Library {
   _id?: string
-  ID: string
-  Title: string
-  Story: string
-  Lyric: string
-  Date?: Date
+  id: string
+  title: string
+  story: string
+  lyric: string
+  date?: Date
 }
 
 export interface LibraryResponse {
