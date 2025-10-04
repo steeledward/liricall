@@ -157,6 +157,41 @@
                   </v-col>
                 </v-row>
               </v-form>
+              <v-row>
+                <v-col cols="12">
+                  <!-- Image Upload Field -->
+                  <v-file-input
+                    v-model="imageFile"
+                    accept="image/*"
+                    :error-messages="imageErrors"
+                    label="Upload Image"
+                    prepend-icon="mdi-camera"
+                    @click:clear="clearImage"
+                    @update:model-value="handleImageChange"
+                  />
+                </v-col>
+                <v-col cols="12">
+                  <!-- Image Preview -->
+                  <v-card v-if="imagePreview" class="mt-4" max-width="300">
+                    <v-img contain height="200" :src="imagePreview" />
+                    <v-card-actions>
+                      <v-btn color="error" @click="clearImage">Remove Image</v-btn>
+                    </v-card-actions>
+                  </v-card>
+                </v-col>
+                <v-col cols="12">
+                  <!-- Upload Button -->
+                  <v-btn
+                    class="mt-4"
+                    color="primary"
+                    :disabled="!isFormValid"
+                    :loading="uploading"
+                    @click="handleSubmitPortrait"
+                  >
+                    Upload Image
+                  </v-btn>
+                </v-col>
+              </v-row>
             </v-card-text>
 
             <v-divider />
@@ -204,12 +239,26 @@
   const selectedLibrary = ref<Library>()
   const showConfirmDelete = ref<boolean>(false)
 
+  // Add or Update Library
   const formVisible = ref<boolean>(false)
   const title = ref<string>('')
   const story = ref<string>('')
   const lyric = ref<string>('')
   const valid = ref<boolean>(false)
   const saving = ref(false)
+
+  // Portrait upload
+  const imageFile = ref(null)
+  const imagePreview = ref('')
+  const imageErrors = ref('')
+  const uploading = ref(false)
+
+  // Validation rules
+  const config = {
+    allowedExtensions: ['.jpg', '.jpeg', '.png', '.gif', '.webp', '.svg'],
+    allowedMimeTypes: ['image/jpeg', 'image/png', 'image/gif', 'image/webp', 'image/svg+xml'],
+    maxSize: 5 * 1024 * 1024, // 5MB
+  }
 
   // Snackbar for notifications
   const snackbar = ref({
@@ -231,7 +280,139 @@
     return fullString ? fullString.toString().slice(0, 20) : ''
   }
 
+  // Computed properties
+  const isFormValid = computed(() => {
+    return imageFile.value && !imageErrors.value
+  })
+
+  // Improved file validation
+  function validateFile (file) {
+    // Check if file exists and is a proper File object
+    if (!file || !(file instanceof File)) {
+      return 'Invalid file selected'
+    }
+
+    // Check file size
+    if (file.size > config.maxSize) {
+      return `File size must be less than ${config.maxSize / 1024 / 1024}MB`
+    }
+
+    // Check file type using multiple methods
+    const fileExtension = '.' + file.name.split('.').pop().toLowerCase()
+    const isValidExtension = config.allowedExtensions.includes(fileExtension)
+    const isValidMimeType = config.allowedMimeTypes.includes(file.type)
+
+    // Also check if the file is actually an image by its mime type
+    const isImageMimeType = file.type.startsWith('image/')
+
+    if (!isValidExtension && !isValidMimeType && !isImageMimeType) {
+      return `Invalid file type. Allowed types: ${config.allowedExtensions.join(', ')}`
+    }
+
+    return null
+  }
+
+  // Safe file reading function
+  function readFileAsDataURL (file) {
+    return new Promise((resolve, reject) => {
+      // Validate that it's a proper File/Blob object
+      if (!file || !(file instanceof Blob)) {
+        reject(new Error('Invalid file object'))
+        return
+      }
+
+      const reader = new FileReader()
+
+      reader.addEventListener('load', e => {
+        resolve(e.target.result)
+      })
+
+      reader.onerror = () => {
+        reject(new Error('Failed to read file'))
+      }
+
+      reader.addEventListener('abort', () => {
+        reject(new Error('File reading was aborted'))
+      })
+
+      try {
+        reader.readAsDataURL(file)
+      } catch (error) {
+        reject(new Error('Error reading file: ' + error.message))
+      }
+    })
+  }
+
+  // Image change handler
+  async function handleImageChange (file) {
+    imageErrors.value = ''
+
+    if (!file) {
+      clearImage()
+      return
+    }
+
+    // Validate file first
+    const validationError = validateFile(file)
+    if (validationError) {
+      imageErrors.value = validationError
+      imageFile.value = null
+      return
+    }
+
+    try {
+      // Use the safe file reading function
+      const previewUrl = await readFileAsDataURL(file)
+      imagePreview.value = previewUrl
+    } catch (error) {
+      console.error('File reading error:', error)
+      imageErrors.value = error.message
+      imageFile.value = null
+      imagePreview.value = ''
+    }
+  }
+
+  // Clear image
+  function clearImage () {
+    imageFile.value = null
+    imagePreview.value = ''
+    imageErrors.value = ''
+  }
+
   // Methods
+
+  async function handleSubmitPortrait (): Promise<void> {
+    if (!isFormValid.value) return
+
+    loading.value = true
+    uploading.value = true
+
+    try {
+      if (imageFile.value) {
+        const formData = new FormData()
+        formData.append('file', imageFile.value)
+        // formData.append('_id', selectedLibrary.value?._id)
+
+        const response = await api.post('/api/libraries/portrait', formData)
+        console.log(response.data)
+
+        if (response.status === 200 || response.status === 201) {
+          showSnackbar('Portrait updated', 'primary')
+          fetchLibraries()
+        } else {
+          throw new Error(`Unexpected response status: ${response.status}`)
+        }
+      }
+    } catch (error) {
+      console.error('Error updating portrait:', error)
+      showSnackbar('Error updating portrait', 'error')
+      showConfirmDelete.value = false
+    } finally {
+      loading.value = false
+      uploading.value = false
+    }
+  }
+
   async function fetchLibraries (): Promise<void> {
     loading.value = true
     try {
@@ -340,6 +521,13 @@
     }
   }
 
+  // Watch for file changes
+  watch(imageFile, newFile => {
+    if (!newFile) {
+      imagePreview.value = ''
+    }
+  })
+
   // Lifecycle hooks
   onMounted(() => {
     fetchLibraries()
@@ -392,10 +580,6 @@
 
 .close-btn:hover {
   transform: rotate(90deg);
-}
-
-.v-data-table {
-  cursor: pointer;
 }
 
 @keyframes fadeIn {
