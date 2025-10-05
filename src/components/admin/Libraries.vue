@@ -161,19 +161,20 @@
                 <v-col cols="12">
                   <!-- Image Upload Field -->
                   <v-file-input
+                    ref="fileInput"
                     v-model="imageFile"
                     accept="image/*"
                     :error-messages="imageErrors"
                     label="Upload Image"
                     prepend-icon="mdi-camera"
+                    @change="handleFileSelect"
                     @click:clear="clearImage"
-                    @update:model-value="handleImageChange"
                   />
                 </v-col>
                 <v-col cols="12">
                   <!-- Image Preview -->
-                  <v-card v-if="imagePreview" class="mt-4" max-width="300">
-                    <v-img contain height="200" :src="imagePreview" />
+                  <v-card v-if="previewUrl" class="mt-4" max-width="300">
+                    <v-img contain height="200" :src="previewUrl" />
                     <v-card-actions>
                       <v-btn color="error" @click="clearImage">Remove Image</v-btn>
                     </v-card-actions>
@@ -191,6 +192,10 @@
                     Upload Image
                   </v-btn>
                 </v-col>
+                <!-- Error Message -->
+                <div v-if="error" class="error-message">
+                  {{ error }}
+                </div>
               </v-row>
             </v-card-text>
 
@@ -245,13 +250,16 @@
   const story = ref<string>('')
   const lyric = ref<string>('')
   const valid = ref<boolean>(false)
-  const saving = ref(false)
+  const saving = ref<boolean>(false)
 
   // Portrait upload
-  const imageFile = ref(null)
-  const imagePreview = ref('')
-  const imageErrors = ref('')
-  const uploading = ref(false)
+  const imageFile = ref<File | null>(null)
+  const imagePreview = ref<string>('')
+  const imageErrors = ref<string>('')
+  const uploading = ref<boolean>(false)
+  const selectedFile = ref<File | null>(null)
+  const error = ref<string>('')
+  const previewUrl = ref<string>('')
 
   // Validation rules
   const config = {
@@ -285,90 +293,43 @@
     return imageFile.value && !imageErrors.value
   })
 
-  // Improved file validation
-  function validateFile (file) {
-    // Check if file exists and is a proper File object
-    if (!file || !(file instanceof File)) {
-      return 'Invalid file selected'
+  function validateAndSetFile (file: File): void {
+    console.log('Validating and setting file')
+
+    error.value = ''
+
+    // Check file type
+    /*
+    if (!config.allowedExtensions.includes(file.type)) {
+      error.value = 'Invalid file type. Please select an image file.'
+      return
     }
+    */
 
     // Check file size
     if (file.size > config.maxSize) {
-      return `File size must be less than ${config.maxSize / 1024 / 1024}MB`
+      error.value = `File size too large. Maximum size is ${config.maxSize / 1024 / 1024}MB.`
+      return
     }
 
-    // Check file type using multiple methods
-    const fileExtension = '.' + file.name.split('.').pop().toLowerCase()
-    const isValidExtension = config.allowedExtensions.includes(fileExtension)
-    const isValidMimeType = config.allowedMimeTypes.includes(file.type)
+    selectedFile.value = file
+    // emit('fileSelected', file)
+    console.log(selectedFile.value)
 
-    // Also check if the file is actually an image by its mime type
-    const isImageMimeType = file.type.startsWith('image/')
-
-    if (!isValidExtension && !isValidMimeType && !isImageMimeType) {
-      return `Invalid file type. Allowed types: ${config.allowedExtensions.join(', ')}`
-    }
-
-    return null
-  }
-
-  // Safe file reading function
-  function readFileAsDataURL (file) {
-    return new Promise((resolve, reject) => {
-      // Validate that it's a proper File/Blob object
-      if (!file || !(file instanceof Blob)) {
-        reject(new Error('Invalid file object'))
-        return
-      }
-
-      const reader = new FileReader()
-
-      reader.addEventListener('load', e => {
-        resolve(e.target.result)
-      })
-
-      reader.onerror = () => {
-        reject(new Error('Failed to read file'))
-      }
-
-      reader.addEventListener('abort', () => {
-        reject(new Error('File reading was aborted'))
-      })
-
-      try {
-        reader.readAsDataURL(file)
-      } catch (error) {
-        reject(new Error('Error reading file: ' + error.message))
-      }
+    // Create preview
+    const reader = new FileReader()
+    reader.addEventListener('load', e => {
+      previewUrl.value = e.target?.result as string
     })
+    reader.readAsDataURL(file)
   }
 
-  // Image change handler
-  async function handleImageChange (file) {
-    imageErrors.value = ''
+  function handleFileSelect (event: Event): void {
+    const target = event.target as HTMLInputElement
+    const file = target.files?.[0]
 
-    if (!file) {
-      clearImage()
-      return
-    }
-
-    // Validate file first
-    const validationError = validateFile(file)
-    if (validationError) {
-      imageErrors.value = validationError
-      imageFile.value = null
-      return
-    }
-
-    try {
-      // Use the safe file reading function
-      const previewUrl = await readFileAsDataURL(file)
-      imagePreview.value = previewUrl
-    } catch (error) {
-      console.error('File reading error:', error)
-      imageErrors.value = error.message
-      imageFile.value = null
-      imagePreview.value = ''
+    if (file) {
+      validateAndSetFile(file)
     }
   }
 
@@ -388,12 +349,16 @@
     uploading.value = true
 
     try {
-      if (imageFile.value) {
+      if (selectedFile.value) {
         const formData = new FormData()
-        formData.append('file', imageFile.value)
+        formData.append('image', selectedFile.value)
         // formData.append('_id', selectedLibrary.value?._id)
 
-        const response = await api.post('/api/libraries/portrait', formData)
+        const response = await api.post('/api/libraries/portrait', formData, {
+          headers: {
+            'Content-Type': 'multipart/form-data',
+          },
+        })
         console.log(response.data)
 
         if (response.status === 200 || response.status === 201) {

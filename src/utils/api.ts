@@ -34,7 +34,7 @@ api.interceptors.response.use(
 export function useApi () {
   return {
     get: (url: string, params?: any) => api.get(url, { params }),
-    post: (url: string, data?: any) => api.post(url, data),
+    post: (url: string, data?: any, config?: any) => api.post(url, data, config),
     put: (url: string, data?: any) => api.put(url, data),
     delete: (url: string, data?: any) => api.delete(url, data),
   }
