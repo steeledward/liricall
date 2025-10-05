@@ -12,7 +12,7 @@ declare module 'vue' {
     GlobalSnackbar: typeof import('./components/GlobalSnackbar.vue')['default']
     Header: typeof import('./components/Header.vue')['default']
     Index: typeof import('./components/Index.vue')['default']
-    Libraries: typeof import('./components/admin/Libraries.vue')['default']
+    Libraries: typeof import('./components/Libraries.vue')['default']
     Payment: typeof import('./components/Payment.vue')['default']
     PublicAppSheet: typeof import('./components/PublicAppSheet.vue')['default']
     Referers: typeof import('./components/admin/Referers.vue')['default']

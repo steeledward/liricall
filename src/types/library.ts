@@ -6,6 +6,7 @@ export interface Library {
   story: string
   lyric: string
   date?: Date
+  stars: number
 }
 
 export interface LibraryResponse {

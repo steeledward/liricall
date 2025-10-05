@@ -1,59 +1,57 @@
 <template>
-  <v-header>
-    <v-app-bar color="primary">
-      <v-app-bar-title class="d-flex align-center">
-        <RouterLink to="/">
-          <v-icon class="mr-2" color="black" icon="mdi-music" size="x-large" />
-        </RouterLink>
-        <span class="font-weight-bold">{{ appName }}</span>
-        <span class="ml-2 hidden-sm-and-down">{{ slogan }}</span>
-      </v-app-bar-title>
+  <v-app-bar color="primary">
+    <v-app-bar-title class="d-flex align-center">
+      <RouterLink to="/">
+        <v-icon class="mr-2" color="black" icon="mdi-music" size="x-large" />
+      </RouterLink>
+      <span class="font-weight-bold">{{ appName }}</span>
+      <span class="ml-2 hidden-sm-and-down">{{ slogan }}</span>
+    </v-app-bar-title>
 
-      <v-spacer />
+    <v-spacer />
 
-      <!-- Language Selector -->
-      <v-menu>
-        <template #activator="{ props }">
-          <v-btn v-bind="props" icon>
-            <v-icon>mdi-translate</v-icon>
-          </v-btn>
-        </template>
-        <v-list>
-          <v-list-item
-            v-for="lang in languages"
-            :key="lang.value"
-            @click="setLanguage(lang.value)"
-          >
-            <v-list-item-title>{{ lang.title }}</v-list-item-title>
-          </v-list-item>
-        </v-list>
-      </v-menu>
+    <!-- Language Selector -->
+    <v-menu>
+      <template #activator="{ props }">
+        <v-btn v-bind="props" icon>
+          <v-icon>mdi-translate</v-icon>
+        </v-btn>
+      </template>
+      <v-list>
+        <v-list-item
+          v-for="lang in languages"
+          :key="lang.value"
+          @click="setLanguage(lang.value)"
+        >
+          <v-list-item-title>{{ lang.title }}</v-list-item-title>
+        </v-list-item>
+      </v-list>
+    </v-menu>
 
-      <!-- Theme Selector -->
-      <v-menu>
-        <template #activator="{ props }">
-          <v-btn v-bind="props" icon>
-            <v-icon>mdi-theme-light-dark</v-icon>
-          </v-btn>
-        </template>
-        <v-list>
-          <v-list-item
-            v-for="t in themes"
-            :key="t.value"
-            @click="setTheme(t.value)"
-          >
-            <v-list-item-title>{{ t.title }}</v-list-item-title>
-          </v-list-item>
-        </v-list>
-      </v-menu>
+    <!-- Theme Selector -->
+    <v-menu>
+      <template #activator="{ props }">
+        <v-btn v-bind="props" icon>
+          <v-icon>mdi-theme-light-dark</v-icon>
+        </v-btn>
+      </template>
+      <v-list>
+        <v-list-item
+          v-for="t in themes"
+          :key="t.value"
+          @click="setTheme(t.value)"
+        >
+          <v-list-item-title>{{ t.title }}</v-list-item-title>
+        </v-list-item>
+      </v-list>
+    </v-menu>
 
-      <!-- Auth Section -->
-      <SocialLogin v-if="!user" />
-      <v-btn v-else icon @click="logout">
-        <v-icon>mdi-logout</v-icon>
-      </v-btn>
-    </v-app-bar>
-  </v-header>
+    <!-- Auth Section -->
+    <SocialLogin v-if="!user" />
+    <v-btn v-else icon @click="logout">
+      <v-icon>mdi-logout</v-icon>
+    </v-btn>
+  </v-app-bar>
 </template>
 
 <script setup lang="ts">
