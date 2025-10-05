@@ -7,6 +7,7 @@ import Libraries from '@/components/Libraries.vue'
 import Payment from '@/components/Payment.vue'
 import PublicAppSheet from '@/components/PublicAppSheet.vue'
 import { useAuthStore } from '../stores/auth'
+import Genres from '@/components/admin/Genres.vue'
 
 const routes = [
   {
@@ -43,6 +44,11 @@ const routes = [
     path: '/admin/reviews',
     name: '/Admin/Reviews',
     component: Reviews,
+  },
+  {
+    path: '/admin/genres',
+    name: '/Admin/Genres',
+    component: Genres,
   },
 ]
 
